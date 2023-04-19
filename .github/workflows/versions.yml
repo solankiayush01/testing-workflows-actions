@@ -1,0 +1,73 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Run Action every hour or one Time
+
+# Controls when the workflow will run
+on:
+#   schedule:
+#     - cron: "*/10 * * * *"
+    
+  workflow_dispatch:
+
+# run all jobs one by one
+jobs:
+  run-once:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout to repo
+        uses: actions/checkout@v3
+
+      - name: Install unzip
+        run: sudo apt-get update && sudo apt-get install -y unzip
+
+      - name: Download environment file
+        run: |
+          echo "Starting the download"
+          wget https://download.moodle.org/environment/environment.zip -O environment.zip
+          echo "Download completed"
+      
+      - name: Unzip file
+        run: yes | unzip environment.zip 
+
+      - name: Download Versions file
+        run: |
+          echo "Starting the download"
+          wget https://raw.githubusercontent.com/moodle/devdocs/main/data/versions.json -O moodleVersions.json
+          echo "Download completed"
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+
+      - name: Output for current directory
+        run: ls & pwd
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run JS file
+        run: node test.js
+        
+      - name: Delete files
+        run: rm -rf moodleVersions.json ./environment environment.zip
+    
+      - name: Create pull request
+        id: cpr
+        uses: peter-evans/create-pull-request@v5
+        with:
+          commit-message: 'Add versions.json'
+          branch: add-file
+          title: 'Add versions.json'
+          body: 'Add versions.json file'
+          labels: 'file'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Merge Pull Request
+        if: steps.cpr.outputs.pull-request-operation == 'created'
+        uses: peter-evans/enable-pull-request-automerge@v3
+        with:
+          pull-request-number: ${{ steps.cpr.outputs.pull-request-number }}
+          merge-method: squash
+          token: "${{ secrets.GITHUB_TOKEN }}"
