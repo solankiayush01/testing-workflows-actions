@@ -1,13 +1,11 @@
-# This is a basic workflow to help you get started with Actions
-
-name: Run Action every hour or one Time
+name: Create Versions.json every day
 
 # Controls when the workflow will run
 on:
-#   schedule:
-#     - cron: "*/10 * * * *"
-    
-  workflow_dispatch:
+
+  # schedule action to run 9 am everyday
+  schedule:
+    - cron: "0 9 * * *"
 
 # run all jobs one by one
 jobs:
@@ -34,7 +32,6 @@ jobs:
           echo "Starting the download"
           wget https://raw.githubusercontent.com/moodle/devdocs/main/data/versions.json -O moodleVersions.json
           echo "Download completed"
-
       - name: Install Node.js
         uses: actions/setup-node@v3
         with:
@@ -47,11 +44,11 @@ jobs:
         run: npm install
 
       - name: Run JS file
-        run: node test.js
-        
+        run: node runWorkflow.js
+
       - name: Delete files
         run: rm -rf moodleVersions.json ./environment environment.zip
-    
+
       - name: Create pull request
         id: cpr
         uses: peter-evans/create-pull-request@v5
@@ -63,7 +60,7 @@ jobs:
           labels: 'file'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
+
       - name: Merge Pull Request
         if: steps.cpr.outputs.pull-request-operation == 'created'
         uses: peter-evans/enable-pull-request-automerge@v3
