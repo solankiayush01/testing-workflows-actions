@@ -4,8 +4,10 @@ name: Create Versions.json every day
 on:
 
   # schedule action to run 9 am everyday
-  schedule:
-    - cron: "0 9 * * *"
+#   schedule:
+#     - cron: "0 9 * * *"
+
+workflow_dispatch
 
 # run all jobs one by one
 jobs:
