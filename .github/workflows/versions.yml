@@ -2,12 +2,9 @@ name: Create Versions.json every day
 
 # Controls when the workflow will run
 on:
-
+ 
   # schedule action to run 9 am everyday
-#   schedule:
-#     - cron: "0 9 * * *"
-
- workflow_dispatch:
+  workflow_dispatch:
 
 # run all jobs one by one
 jobs:
@@ -39,15 +36,18 @@ jobs:
         with:
           node-version: '16.x'
 
-      - name: Output for current directory
-        run: ls & pwd
-
       - name: Install Dependencies
-        run: npm install
+        run: npm install --prefix githubActions/
 
       - name: Run JS file
-        run: node runWorkflow.js
+        run: node githubActions/versionJsonScript.js
 
+      - name: Check for errors
+        if: ${{ failure() }}
+        run: |
+          echo "There was an error running the script."
+          echo "Error message: ${{ job.status }}"
+          exit 1
       - name: Delete files
         run: rm -rf moodleVersions.json ./environment environment.zip
 
@@ -56,17 +56,9 @@ jobs:
         uses: peter-evans/create-pull-request@v5
         with:
           commit-message: 'Add versions.json'
-          branch: add-file
-          title: 'Add versions.json'
-          body: 'Add versions.json file'
+          branch: addVersionsJson
+          title: 'Updated data/versions.json'
+          body: 'Updated versions.json file'
           labels: 'file'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Merge Pull Request
-        if: steps.cpr.outputs.pull-request-operation == 'created'
-        uses: peter-evans/enable-pull-request-automerge@v3
-        with:
-          pull-request-number: ${{ steps.cpr.outputs.pull-request-number }}
-          merge-method: squash
-          token: "${{ secrets.GITHUB_TOKEN }}"
