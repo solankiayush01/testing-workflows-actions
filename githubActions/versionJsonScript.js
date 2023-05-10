@@ -180,7 +180,7 @@ async function mergeData(versionsData, envData) {
             latestLtsData.push(currentVersionData);
 
         ++versionDataIndex;
-    }
+    };
 
     // map the data with download links of releases
     latestLtsData = await Promise.all(latestLtsData.map(async (currentVersion) => {
@@ -227,7 +227,17 @@ async function mergeData(versionsData, envData) {
                 return { ...currentRelease, ...downloadUrls };
             }
         ));
-
+        currentReleases.sort((a,b)=>{
+            return a.version - b.version
+        });
+        const index = currentReleases.length - 1; 
+        currentReleases.push({
+            name: `${currentReleases[index].name}+`,
+            releaseDate: "Latest Release",
+            version: currentReleases[index].version,
+            zip: currentReleases[index].zip,
+            tgz: currentReleases[index].tgz,
+        })
         return { ...currentVersion, releases: currentReleases };
     }));
 
