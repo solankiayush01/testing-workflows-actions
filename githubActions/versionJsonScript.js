@@ -125,20 +125,25 @@ async function checkCorrectLink(link) {
  * @param {string} link - the link prefix
  * @returns {object} - the object that contains zip and tgz links 
  */
-async function generateDownloadLinksObject(link) {
+async function generateDownloadLinksObject(link, isLatest, versionCode, version) {
 
     const isLinkValid = await checkCorrectLink(`${link}.zip`);
 
     let isRemovedLink = false;
 
-    if (!isLinkValid) {
+    if (!isLinkValid && !isLatest) {
         const isRemovedLinkValid = await checkCorrectLink(`${link}.zip.removed`);
 
         if (!isRemovedLinkValid) process.exit(1);
 
         else isRemovedLink = true;
 
+    } else if (isLinkValid && isLatest) {
+        link = `${DOWNLOAD_LINK_PREFIX}${versionCode}/moodle-${version}`
+    } else if (!isLinkValid && isLatest) {
+        link = `${DOWNLOAD_LINK_PREFIX}${versionCode}/moodle-latest-${versionCode}`
     }
+
 
     const downloadLinks = {
         zip: isRemovedLink ? `${link}.zip.removed` : `${link}.zip`,
@@ -180,7 +185,7 @@ async function mergeData(versionsData, envData) {
             latestLtsData.push(currentVersionData);
 
         ++versionDataIndex;
-    };
+    }
 
     // map the data with download links of releases
     latestLtsData = await Promise.all(latestLtsData.map(async (currentVersion) => {
@@ -196,34 +201,40 @@ async function mergeData(versionsData, envData) {
 
                 // first version
                 // example  https://download.moodle.org/download.php/stable39/moodle-3.9.tgz
-                if (index == 0) {
-                    const link = generateOtherDownloadLink(
-                        versionCode,
-                        currentVersion.name
-                    );
+                // if (index == 0) {
+                //     const link = generateOtherDownloadLink(
+                //         versionCode,
+                //         currentVersion.name
+                //     );
 
-                    downloadUrls = await generateDownloadLinksObject(link);
+                //     downloadUrls = await generateDownloadLinksObject(link, false);
 
-                }
+                // }
 
                 // latest versions
                 // example = https://download.moodle.org/download.php/stable311/moodle-latest-311.tgz
-                else if (index == currentVersion["releases"].length - 1 && !currentRelease["notes"]) {
-                    const link = generateLatestDownloadLink(versionCode);
+                if (index == currentVersion["releases"].length - 1 && !currentRelease["notes"]) {
+                    const link = generateOtherDownloadLink(
+                        versionCode,
+                        currentRelease.name
+                    );
 
-                    downloadUrls = await generateDownloadLinksObject(link);
+                    downloadUrls = await generateDownloadLinksObject(link, true);
+
+
                 }
 
                 // normal versions
                 else {
                     const link = generateOtherDownloadLink(
                         versionCode,
-                        currentRelease.name
+                        currentRelease.name,
+                        false
                     );
 
-                    downloadUrls = await generateDownloadLinksObject(link);
+                    downloadUrls = await generateDownloadLinksObject(link, false);
                 }
-
+                
                 return { ...currentRelease, ...downloadUrls };
             }
         ));
@@ -231,13 +242,14 @@ async function mergeData(versionsData, envData) {
             return a.version - b.version
         });
         const index = currentReleases.length - 1;
-        if (!currentReleases[index].notes) {
+        const isLatestUrl = currentReleases[index].zip.split('-').includes('latest');
+        if (!isLatestUrl && !currentReleases[index].notes) {
             currentReleases.push({
                 name: `${currentReleases[index].name}+`,
                 releaseDate: "Latest Release",
                 version: currentReleases[index].version,
-                zip: currentReleases[index].zip,
-                tgz: currentReleases[index].tgz,
+                zip: `${DOWNLOAD_LINK_PREFIX}${versionCode}/moodle-latest-${versionCode}.zip`,
+                tgz: `${DOWNLOAD_LINK_PREFIX}${versionCode}/moodle-latest-${versionCode}.tgz`,
             })
         }
         return { ...currentVersion, releases: currentReleases };
