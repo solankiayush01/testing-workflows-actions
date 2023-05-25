@@ -219,7 +219,7 @@ async function mergeData(versionsData, envData) {
                         currentRelease.name
                     );
 
-                    downloadUrls = await generateDownloadLinksObject(link, true);
+                    downloadUrls = await generateDownloadLinksObject(link, true,  versionCode, currentRelease.name);
 
 
                 }
