@@ -213,7 +213,7 @@ async function mergeData(versionsData, envData) {
 
                 // latest versions
                 // example = https://download.moodle.org/download.php/stable311/moodle-latest-311.tgz
-                if (index == currentVersion["releases"].length - 1 && !currentRelease["notes"]) {
+                else if (index == currentVersion["releases"].length - 1 && !currentRelease["notes"]) {
                     const link = generateOtherDownloadLink(
                         versionCode,
                         currentRelease.name
