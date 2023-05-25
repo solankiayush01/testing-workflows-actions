@@ -21,6 +21,13 @@
                 "zip": "https://download.moodle.org/download.php/stable401/moodle-4.1.1.zip",
                 "tgz": "https://download.moodle.org/download.php/stable401/moodle-4.1.1.tgz"
             },
+              {
+                "name": "4.1.1+",
+                "releaseDate": "Latest Weekly",
+                "version": 2022112801,
+                "zip": "https://download.moodle.org/download.php/stable401/moodle-4.1.1.zip",
+                "tgz": "https://download.moodle.org/download.php/stable401/moodle-4.1.1.tgz"
+            },
             {
                 "name": "4.1.2",
                 "releaseDate": "13 March 2023",
