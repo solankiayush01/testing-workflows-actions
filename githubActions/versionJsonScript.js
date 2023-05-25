@@ -120,7 +120,9 @@ async function checkCorrectLink(link) {
 }
 async function getDataFromAPI(api) {
     try {
+        console.log("this is api url", api);
         const response = await fetch(api);
+        console.log("response", response);
         const status = response.status;
         if (status >= 400) {
             throw new Error(`Link ${api} returned status ${status}`);
