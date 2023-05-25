@@ -201,7 +201,7 @@ async function mergeData(versionsData, envData) {
                         versionCode,
                         currentVersion.name
                     );
-                    
+
                     downloadUrls = await generateDownloadLinksObject(link);
 
                 }
@@ -227,17 +227,19 @@ async function mergeData(versionsData, envData) {
                 return { ...currentRelease, ...downloadUrls };
             }
         ));
-        currentReleases.sort((a,b)=>{
+        currentReleases.sort((a, b) => {
             return a.version - b.version
         });
-        const index = currentReleases.length - 1; 
-        currentReleases.push({
-            name: `${currentReleases[index].name}+`,
-            releaseDate: "Latest Release",
-            version: currentReleases[index].version,
-            zip: currentReleases[index].zip,
-            tgz: currentReleases[index].tgz,
-        })
+        const index = currentReleases.length - 1;
+        if (!currentReleases[index].notes) {
+            currentReleases.push({
+                name: `${currentReleases[index].name}+`,
+                releaseDate: "Latest Release",
+                version: currentReleases[index].version,
+                zip: currentReleases[index].zip,
+                tgz: currentReleases[index].tgz,
+            })
+        }
         return { ...currentVersion, releases: currentReleases };
     }));
 
