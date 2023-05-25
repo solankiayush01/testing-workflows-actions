@@ -118,6 +118,20 @@ async function checkCorrectLink(link) {
         return false;
     }
 }
+async function getDataFromAPI(api) {
+    try {
+        const response = await fetch(api);
+        const status = response.status;
+        if (status >= 400) {
+            throw new Error(`Link ${api} returned status ${status}`);
+        }
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error(`Error checking link response code: ${error}`);
+        return null;
+    }
+}
 
 /**
  * Function to generate download links object and return it
@@ -243,6 +257,8 @@ async function mergeData(versionsData, envData) {
         const index = currentReleases.length - 1;
         const isLatestUrl = currentReleases[index].zip.split('-').includes('latest');
         if (!isLatestUrl && !currentReleases[index].notes) {
+            const latestUrlVersion = await getDataFromAPI(`https://raw.githubusercontent.com/moodle/moodle/MOODLE_${versionCode}_STABLE/version.php`);
+            console.log("this is latest version", latestUrlVersion);
             currentReleases.push({
                 name: `${currentReleases[index].name}+`,
                 releaseDate: "Latest Release",
