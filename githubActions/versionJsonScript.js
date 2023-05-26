@@ -133,7 +133,7 @@ async function getDataFromAPI(api) {
         console.log("includes", dataStr.includes('$version'));
         const splitFile =  dataStr.split("=");
         console.log("split file", splitFile);
-        const versionNum = splitFile[splitFile.indexOf('$version') + 1];
+        const versionNum = splitFile[splitFile.indexOf('$version  ') + 1];
         console.log("this is version num",versionNum);
         return data;
     } catch (error) {
