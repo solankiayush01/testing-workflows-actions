@@ -127,7 +127,7 @@ async function getDataFromAPI(api) {
         if (status >= 400) {
             throw new Error(`Link ${api} returned status ${status}`);
         }
-        const data = await response.json();
+        const data = await response.text();
         console.log("this is data", data);
         return data;
     } catch (error) {
