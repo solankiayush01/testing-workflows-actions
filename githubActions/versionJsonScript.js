@@ -170,7 +170,7 @@ async function generateDownloadLinksObject(link, isLatest, versionCode, version)
 
     const downloadLinks = {
         zip: isRemovedLink ? `${link}.zip.removed` : `${link}.zip`,
-        tgz: isRemovedLink ? `$data{link}.tgz.removed` : `${link}.tgz`,
+        tgz: isRemovedLink ? `${link}.tgz.removed` : `${link}.tgz`,
     }
 
     return downloadLinks;
