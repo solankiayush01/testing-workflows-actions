@@ -118,24 +118,24 @@ async function checkCorrectLink(link) {
         return false;
     }
 }
+
 async function getDataFromAPI(api) {
     try {
-        console.log("this is api url", api);
+        let latestWeeklyVersion = '';
         const response = await fetch(api);
-        console.log("response", response);
         const status = response.status;
         if (status >= 400) {
             throw new Error(`Link ${api} returned status ${status}`);
         }
         const data = await response.text();
-        const dataStr = data.toString();
-        console.log("this is data", dataStr);
-        console.log("includes", dataStr.includes('$version'));
-        const splitFile =  dataStr.split("=");
-        console.log("split file", splitFile);
-        const versionNum = splitFile[splitFile.indexOf('$version  ') + 1];
-        console.log("this is version num",versionNum);
-        return data;
+        const textByLine = data.split("\n")
+        textByLine.forEach(line => {
+            // console.log(line)
+            if (line.split(" ").includes('$version')) {
+                latestWeeklyVersion = line.split("=")[1].trim().split(';')[0];
+            }
+        });
+        return latestWeeklyVersion;
     } catch (error) {
         console.error(`Error checking link response code: ${error}`);
         return null;
@@ -170,7 +170,7 @@ async function generateDownloadLinksObject(link, isLatest, versionCode, version)
 
     const downloadLinks = {
         zip: isRemovedLink ? `${link}.zip.removed` : `${link}.zip`,
-        tgz: isRemovedLink ? `${link}.tgz.removed` : `${link}.tgz`,
+        tgz: isRemovedLink ? `$data{link}.tgz.removed` : `${link}.tgz`,
     }
 
     return downloadLinks;
@@ -271,7 +271,7 @@ async function mergeData(versionsData, envData) {
             currentReleases.push({
                 name: `${currentReleases[index].name}+`,
                 releaseDate: "Latest Release",
-                version: currentReleases[index].version,
+                version: latestUrlVersion,
                 zip: `${DOWNLOAD_LINK_PREFIX}${versionCode}/moodle-latest-${versionCode}.zip`,
                 tgz: `${DOWNLOAD_LINK_PREFIX}${versionCode}/moodle-latest-${versionCode}.tgz`,
             })
