@@ -129,7 +129,7 @@ async function getDataFromAPI(api) {
         }
         const data = await response.text();
         const dataStr = data.toString();
-        console.log("this is data", data);
+        console.log("this is data", dataStr);
         return data;
     } catch (error) {
         console.error(`Error checking link response code: ${error}`);
