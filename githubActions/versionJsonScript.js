@@ -128,6 +128,7 @@ async function getDataFromAPI(api) {
             throw new Error(`Link ${api} returned status ${status}`);
         }
         const data = await response.json();
+        console.log("this is data", data);
         return data;
     } catch (error) {
         console.error(`Error checking link response code: ${error}`);
