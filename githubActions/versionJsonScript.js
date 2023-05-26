@@ -131,7 +131,10 @@ async function getDataFromAPI(api) {
         const dataStr = data.toString();
         console.log("this is data", dataStr);
         console.log("includes", dataStr.includes('$version'));
-        console.log("split", dataStr.split("="));
+        const splitFile =  dataStr.split("=");
+        const versionNum = splitFile[splitFile.indexOf('$version') + 1];
+        console.log("this is version num",versionNum);
+        console.log("split",);
         return data;
     } catch (error) {
         console.error(`Error checking link response code: ${error}`);
